@@ -1,1 +1,5 @@
 *.pyc
+apiclient/*.pyc
+oauth2client/*.pyc
+httplib/*.pyc
+uritemplate/*.pyc
