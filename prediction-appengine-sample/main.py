@@ -97,6 +97,7 @@ class TestHandler(webapp2.RequestHandler):
 
   @decorator.oauth_aware
   def get(self):
+    http = decorator.http()
     papi = service.trainedmodels()
     training_instances = []
     for i in range(0,100):
@@ -104,7 +105,7 @@ class TestHandler(webapp2.RequestHandler):
     body = {'id' : 'testPredictor',
         "trainingInstances": training_instances}
 
-    start = papi.insert(project=PROJ_NUMBER, body=body).execute()
+    start = papi.insert(project=PROJ_NUMBER, body=body).execute(http=http)
     self.response.write(start)
 
 class InsertMoviesHandler(webapp2.RequestHandler):
