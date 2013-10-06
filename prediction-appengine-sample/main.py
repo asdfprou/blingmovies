@@ -85,6 +85,12 @@ class MainHandler(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('main.html')
     self.response.write(template.render(variables))
 
+class LoginHandler(webapp2.RequestHandler):
+  @decorator.oauth_aware
+  def get(self):
+    variables = {}
+    template = JINJA_ENVIRONMENT.get_template('login.html')
+    self.response.write(template.render(variables))
 
 class InsertMoviesHandler(webapp2.RequestHandler):
 
@@ -96,6 +102,7 @@ app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
      ('/insert', InsertMoviesHandler),
+     ('/login', LoginHandler),
      (decorator.callback_path, decorator.callback_handler()),
     ],
     debug=True)
