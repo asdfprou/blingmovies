@@ -35,6 +35,7 @@ import webapp2
 import jinja2
 
 
+PROJ_NUMBER = 742994856073
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     autoescape=True,
@@ -94,9 +95,17 @@ class LoginHandler(webapp2.RequestHandler):
 
 class TestHandler(webapp2.RequestHandler):
 
+  @decorator.oauth_aware
   def get(self):
-    service.trainedmodels = papi
+    papi = service.trainedmodels()
+    training_instances = []
+    for i in range(0,100):
+      training_instances.append({"csvInstance": ["horror"], "output":"1"})
+    body = {'id' : 'testPredictor',
+        "trainingInstances": training_instances}
 
+    start = papi.insert(project=PROJ_NUMBER, body=body).execute()
+    self.response.write(start)
 
 class InsertMoviesHandler(webapp2.RequestHandler):
 
