@@ -86,9 +86,16 @@ class MainHandler(webapp2.RequestHandler):
     self.response.write(template.render(variables))
 
 
+class InsertMoviesHandler(webapp2.RequestHandler):
+
+  def post(self):
+    self.response.write(self.request.get('content'))
+
+
 app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
+     ('/insert', InsertMoviesHandler),
      (decorator.callback_path, decorator.callback_handler()),
     ],
     debug=True)
