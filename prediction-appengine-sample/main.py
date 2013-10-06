@@ -92,16 +92,22 @@ class LoginHandler(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('login.html')
     self.response.write(template.render(variables))
 
+class TestHandler(webapp2.RequestHandler):
+
+  def get(self):
+    service.trainedmodels = papi
+
+
 class InsertMoviesHandler(webapp2.RequestHandler):
 
   def post(self):
     self.response.write(self.request.get('content'))
 
-
 app = webapp2.WSGIApplication(
     [
      ('/', MainHandler),
      ('/insert', InsertMoviesHandler),
+     ('/test', TestHandler),
      ('/login', LoginHandler),
      (decorator.callback_path, decorator.callback_handler()),
     ],
