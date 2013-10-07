@@ -25,6 +25,7 @@ and save them as 'client_secrets.json' in the project directory.
 import httplib2
 import logging
 import os
+import time
 
 from apiclient import discovery
 from oauth2client import appengine
@@ -36,6 +37,7 @@ import jinja2
 
 
 PROJ_NUMBER = 742994856073
+MODEL_ID = 'testPredictor'
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     autoescape=True,
@@ -97,16 +99,50 @@ class TestHandler(webapp2.RequestHandler):
 
   @decorator.oauth_aware
   def get(self):
+    model_id = 'testPredictor'
     http = decorator.http()
     papi = service.trainedmodels()
     training_instances = []
     for i in range(0,100):
       training_instances.append({"csvInstance": ["horror"], "output":"1"})
-    body = {'id' : 'testPredictor',
+    body = {'id' : model_id,
         "trainingInstances": training_instances}
 
-    start = papi.insert(project=PROJ_NUMBER, body=body).execute(http=http)
-    self.response.write(start)
+    # start = papi.insert(project=PROJ_NUMBER, body=body).execute(http=http)
+    # self.response.write(start)
+
+    # Wait for the training to complete.
+    print("Waiting for training")
+    self.response.write("Waiting for training")
+    while True:
+      status = papi.get(project=PROJ_NUMBER, id=model_id).execute(http=http)
+      state = status['trainingStatus']
+      print 'Training state: ' + state
+      if state == 'DONE':
+        break
+      elif state == 'RUNNING':
+        time.sleep(5)
+        continue
+      else:
+        raise Exception('Training Error: ' + state)
+
+      # Job has completed.
+      print 'Training completed:'
+      break
+
+class PredictHandler(webapp2.RequestHandler):
+  @decorator.oauth_aware
+  def get(self):
+    # get all movies from the 
+    # eventually becomes the 2 peoples' facebook IDs
+    model_id = 'testPredictor'
+    http = decorator.http()
+    papi = service.trainedmodels()
+    body = {
+        "input": {"csvInstance":"horror"}}
+
+    prediction_response = papi.insert(project=PROJ_NUMBER, hostedModelName = model_id,  body=body).execute(http=http)
+    self.response.write(prediction_response)
 
 class InsertMoviesHandler(webapp2.RequestHandler):
 
